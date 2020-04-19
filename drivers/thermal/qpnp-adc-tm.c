@@ -2147,7 +2147,7 @@ static int qpnp_adc_tm_disable_rearm_high_thresholds(
 		return rc;
 	}
 
-	queue_work(chip->sensor[sensor_num].req_wq,
+		queue_work(chip->sensor[sensor_num].req_wq,
 		&chip->sensor[sensor_num].work);
 
 	return rc;
@@ -2596,8 +2596,7 @@ static irqreturn_t qpnp_adc_tm_low_thr_isr(int irq, void *data)
 
 static int qpnp_adc_tm_rc_check_sensor_trip(struct qpnp_adc_tm_chip *chip,
 			u8 status_low, u8 status_high, int i,
-			int *sensor_low_notify_num, int *sensor_high_notify_num,
-			int *cnt_low, int *cnt_high)
+			int *sensor_low_notify_num, int *sensor_high_notify_num, int *cnt_low, int *cnt_high)
 {
 	int rc = 0;
 	u8 ctl = 0, sensor_mask = 0;
@@ -2777,22 +2776,16 @@ static irqreturn_t qpnp_adc_tm_rc_thr_isr(int irq, void *data)
 	}
 
 	if (sensor_low_notify_num) {
-		if (!work_pending(&chip->trigger_low_thr_work)) {
-			pm_wakeup_event(chip->dev,
-					QPNP_ADC_WAKEUP_SRC_TIMEOUT_MS);
-			queue_work(chip->low_thr_wq, &chip->trigger_low_thr_work);
-		} else
-			force_enable_int_th(chip, true, false);
+		pm_wakeup_event(chip->dev,
+				QPNP_ADC_WAKEUP_SRC_TIMEOUT_MS);
+		queue_work(chip->low_thr_wq, &chip->trigger_low_thr_work);
 	}
 
 	if (sensor_high_notify_num) {
-		if (!work_pending(&chip->trigger_high_thr_work)) {
-			pm_wakeup_event(chip->dev,
-					QPNP_ADC_WAKEUP_SRC_TIMEOUT_MS);
-			queue_work(chip->high_thr_wq,
-					&chip->trigger_high_thr_work);
-		} else
-			force_enable_int_th(chip, false, true);
+		pm_wakeup_event(chip->dev,
+				QPNP_ADC_WAKEUP_SRC_TIMEOUT_MS);
+		queue_work(chip->high_thr_wq,
+				&chip->trigger_high_thr_work);
 	}
 
 	clear_tmp_low_high(chip);
